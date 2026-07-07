@@ -10,35 +10,36 @@
    Token system
    ============================================================ */
 :root{
-  --bg: #eef3f2;
+  --bg: #eef1f4;
   --surface: #ffffff;
-  --surface-2: #f4f7f6;
-  --ink: #142326;
-  --ink-soft: #4b5d60;
-  --line: #d7e0de;
-  --line-soft: #e6ece9;
+  --surface-2: #eef2f5;
+  --ink: #16232b;
+  --ink-soft: #52626c;
+  --line: #d9e1e6;
+  --line-soft: #e8edf0;
 
-  --brand: #0e4d5c;
-  --brand-dark: #0a3743;
-  --brand-tint: #dfeaea;
+  --brand: #123a5c;
+  --brand-dark: #0b2740;
+  --brand-tint: #e1ebf1;
 
-  --accent: #e1a339;
-  --accent-dark: #b9822a;
-  --accent-tint: #fbeed2;
+  --accent: #1fb6cf;
+  --accent-dark: #128fa3;
+  --accent-tint: #dcf5f8;
 
   --ok: #2f9e58;
   --ok-tint: #e2f4e8;
   --warn: #e1a339;
+  --warn-dark: #96731f;
   --warn-tint: #fbeed2;
   --bad: #c1443d;
   --bad-tint: #fbe4e2;
 
-  --sky: #3e7ca6;
-  --violet: #6b4f8c;
+  --sky: #2f8fc7;
+  --violet: #4a6fa5;
 
   --radius: 10px;
   --radius-lg: 16px;
-  --shadow: 0 1px 2px rgba(14,77,92,.06), 0 6px 20px -10px rgba(14,77,92,.18);
+  --shadow: 0 1px 2px rgba(14,58,92,.06), 0 6px 20px -10px rgba(14,58,92,.18);
 
   --font-display: "Space Grotesk", "IBM Plex Sans", sans-serif;
   --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
@@ -98,6 +99,44 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   top:0;
   height:100vh;
 }
+.brand-sub2{
+  font-size:10px;
+  color:#6f97ab;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-top:2px;
+}
+.brand-logo{
+  width:30px;height:30px;flex:none;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1.6px solid var(--accent);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath d='M2 13c2-4 4-6 6-2s4 6 6 2 4-6 6-2' stroke='%231fb6cf' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:center;background-size:60%;
+}
+.brand-logo img, .brand-logo video{
+  width:100%;height:100%;object-fit:cover;
+}
+.brand-logo::after{
+  content:'✎';
+  position:absolute; inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(11,39,64,.72);
+  color:#fff; font-size:11px;
+  opacity:0; transition:opacity .15s;
+}
+.brand-logo:hover::after{opacity:1;}
+.brand-logo .logo-remove{
+  position:absolute; top:-3px; right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:var(--bad); color:#fff; font-size:10px; line-height:15px; text-align:center;
+  display:none; z-index:2;
+}
+.brand-logo.has-custom:hover .logo-remove{display:block;}
+
 .brand{
   display:flex;
   flex-direction:column;
@@ -141,7 +180,7 @@ nav.tabs button svg{flex:none;opacity:.85;}
 nav.tabs button:hover{background:rgba(255,255,255,.06); color:#fff;}
 nav.tabs button.active{
   background:var(--accent);
-  color:#2a1c05;
+  color:#06303a;
   font-weight:600;
 }
 nav.tabs button.active svg{opacity:1;}
@@ -196,7 +235,7 @@ nav.tabs button.active svg{opacity:1;}
 }
 .btn-primary{background:var(--brand); color:#fff;}
 .btn-primary:hover{background:var(--brand-dark);}
-.btn-accent{background:var(--accent); color:#2a1c05;}
+.btn-accent{background:var(--accent); color:#06303a;}
 .btn-accent:hover{background:var(--accent-dark); color:#fff;}
 .btn-ghost{background:var(--surface-2); color:var(--brand-dark); border-color:var(--line);}
 .btn-ghost:hover{background:var(--brand-tint);}
@@ -282,6 +321,7 @@ nav.tabs button.active svg{opacity:1;}
 }
 .kpi .label{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
 .kpi .num.accent{color:var(--accent-dark);}
+.kpi .num.warn{color:var(--warn-dark);}
 .kpi.warn-border{border-left:4px solid var(--warn);}
 .kpi.ok-border{border-left:4px solid var(--ok);}
 
@@ -398,7 +438,7 @@ select:focus, input:focus{border-color:var(--brand);}
 }
 .step.done{background:var(--ok-tint);color:#1c7a41;}
 .step.done .n{background:var(--ok);}
-.step.active{background:var(--accent-tint);color:#96731f;font-weight:700;}
+.step.active{background:var(--accent-tint);color:var(--accent-dark);font-weight:700;}
 .step.active .n{background:var(--accent);}
 
 .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
@@ -514,11 +554,13 @@ select:focus, input:focus{border-color:var(--brand);}
   <aside class="sidebar no-print">
     <div class="brand">
       <div class="mark">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="#e1a339" stroke-width="1.6"/><path d="M4 13c2-4 4-6 6-2s4 6 6 2 4-6 6-2" stroke="#e1a339" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
-        <span class="brand-name">Génesis</span>
+        <div class="brand-logo" id="brand-logo" title="Clic para poner una imagen, GIF o video como logo"></div>
+        <span class="brand-name">Proyecto Génesis</span>
       </div>
       <div class="brand-sub">Rescate y digitalización<br>de datos meteorológicos</div>
+      <div class="brand-sub2">Dirección de Climatología (IMHPA)</div>
     </div>
+    <input type="file" id="logo-file-input" accept="image/*,video/mp4" style="display:none">
 
     <nav class="tabs">
       <button data-tab="resumen" class="active"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Resumen ejecutivo</button>
@@ -560,7 +602,7 @@ select:focus, input:focus{border-color:var(--brand);}
           <div class="card kpi"><div class="num" id="kpi-estaciones">—</div><div class="label">Total estaciones</div></div>
           <div class="card kpi"><div class="num" id="kpi-archivos">—</div><div class="label">Archivos escaneados</div></div>
           <div class="card kpi"><div class="num" id="kpi-datos">—</div><div class="label">Datos rescatados</div></div>
-          <div class="card kpi warn-border"><div class="num accent" id="kpi-extraccion">—</div><div class="label">Avance extracción a tablas</div></div>
+          <div class="card kpi warn-border"><div class="num warn" id="kpi-extraccion">—</div><div class="label">Avance extracción a tablas</div></div>
           <div class="card kpi ok-border"><div class="num" id="kpi-bd">—</div><div class="label">Avance en base de datos</div></div>
         </div>
 
@@ -608,7 +650,7 @@ select:focus, input:focus{border-color:var(--brand);}
         <div class="grid grid-3">
           <div class="card kpi"><div class="num" id="det-kpi-escaneados">—</div><div class="label">Archivos escaneados</div></div>
           <div class="card kpi"><div class="num" id="det-kpi-rescatados">—</div><div class="label">Datos rescatados</div></div>
-          <div class="card kpi"><div class="num accent" id="det-kpi-avance">—</div><div class="label">Avance extracción</div></div>
+          <div class="card kpi"><div class="num warn" id="det-kpi-avance">—</div><div class="label">Avance extracción</div></div>
         </div>
 
         <div class="grid grid-2" style="margin-top:16px">
@@ -881,6 +923,7 @@ let manualRecords = [];   // registros agregados por el equipo
 let manualChapters = [];  // { id, title, parentId, order, content }
 let activeChapterId = null;
 let editingChapter = false;
+let brandLogo = null;     // { type:'image'|'video', dataUrl } — logo personalizado (gif/imagen/mp4)
 let fileHandle = null;    // File System Access API handle (Chrome/Edge)
 let lastLoadedName = null;
 
@@ -1851,6 +1894,72 @@ function printChapter(ch){
 }
 
 /* ============================================================
+   Logo de marca personalizado (imagen, GIF o video MP4)
+   Se guarda dentro del mismo JSON compartido para que todo
+   el equipo vea el mismo logo al cargar los datos.
+   ============================================================ */
+const MAX_LOGO_BYTES = 4 * 1024 * 1024; // 4 MB, razonable para incrustar en el JSON compartido
+
+function renderBrandLogo(){
+  const box = document.getElementById('brand-logo');
+  box.classList.toggle('has-custom', !!brandLogo);
+  const old = box.querySelector('img,video');
+  if(old) old.remove();
+  const removeBtn = box.querySelector('.logo-remove');
+  if(removeBtn) removeBtn.remove();
+
+  if(brandLogo){
+    let media;
+    if(brandLogo.type==='video'){
+      media = document.createElement('video');
+      media.src = brandLogo.dataUrl;
+      media.autoplay = true; media.loop = true; media.muted = true; media.playsInline = true;
+    } else {
+      media = document.createElement('img');
+      media.src = brandLogo.dataUrl;
+      media.alt = 'Logo Proyecto Génesis';
+    }
+    box.appendChild(media);
+    const x = document.createElement('span');
+    x.className = 'logo-remove';
+    x.textContent = '✕';
+    x.title = 'Quitar logo y volver al ícono por defecto';
+    x.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      brandLogo = null;
+      markDirty();
+      renderBrandLogo();
+      toast('Logo removido, volviste al ícono por defecto');
+    });
+    box.appendChild(x);
+  }
+}
+function wireBrandLogo(){
+  const box = document.getElementById('brand-logo');
+  const input = document.getElementById('logo-file-input');
+  box.addEventListener('click', ()=> input.click());
+  input.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > MAX_LOGO_BYTES){
+      toast('El archivo es muy grande (máx. 4 MB) para guardarlo junto con los avances', true);
+      input.value=''; return;
+    }
+    const isVideo = file.type.startsWith('video/');
+    const reader = new FileReader();
+    reader.onload = () => {
+      brandLogo = { type: isVideo?'video':'image', dataUrl: reader.result };
+      markDirty();
+      renderBrandLogo();
+      toast('Logo actualizado ✓ — recuerda "Guardar cambios" para que tus compañeros lo vean');
+    };
+    reader.onerror = () => toast('No se pudo leer el archivo', true);
+    reader.readAsDataURL(file);
+    input.value='';
+  });
+}
+
+/* ============================================================
    Guardar / Cargar (archivo JSON en carpeta compartida)
    ============================================================ */
 function currentPayload(){
@@ -1860,6 +1969,7 @@ function currentPayload(){
     savedAt: new Date().toISOString(),
     manualRecords,
     manualChapters,
+    brandLogo,
   };
 }
 async function saveData(){
@@ -1915,12 +2025,14 @@ function applyLoaded(payload, name){
   if(!payload || !Array.isArray(payload.manualRecords)){ toast('El archivo no tiene el formato esperado', true); return; }
   manualRecords = payload.manualRecords;
   manualChapters = Array.isArray(payload.manualChapters) ? payload.manualChapters : [];
+  brandLogo = payload.brandLogo || null;
   activeChapterId = null;
   editingChapter = false;
   lastLoadedName = name;
   markClean();
   renderRegistroTable();
   renderManualView();
+  renderBrandLogo();
   renderAll();
   toast('Datos cargados desde '+name+' ('+manualRecords.length+' registros, '+manualChapters.length+' capítulos) ✓');
 }
@@ -2038,6 +2150,8 @@ function init(){
   wireRegistroForm();
   wireManual();
   renderManualView();
+  wireBrandLogo();
+  renderBrandLogo();
 
   document.getElementById('sel-det-estacion').addEventListener('change', e=>{ state.detFilter.estacion=e.target.value; renderDetalle(); });
   document.getElementById('sel-det-variable').addEventListener('change', e=>{ state.detFilter.variable=e.target.value; renderDetalle(); });
