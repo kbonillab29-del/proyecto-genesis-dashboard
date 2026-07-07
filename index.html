@@ -1157,17 +1157,58 @@ function renderMap(container, highlightCode){
   const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('viewBox', `0 0 ${MAP_W} ${MAP_H}`);
   svg.setAttribute('role','img');
-  svg.setAttribute('aria-label','Mapa esquemático de estaciones');
+  svg.setAttribute('aria-label','Mapa esquemático de estaciones con relieve ilustrativo');
+
+  // --- defs: gradiente hipsométrico + textura de relieve (sin dependencias externas) ---
+  const defs = document.createElementNS(svg.namespaceURI,'defs');
+  defs.innerHTML = `
+    <linearGradient id="hypsoGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#bfe3c9"/>
+      <stop offset="22%" stop-color="#a9d6ab"/>
+      <stop offset="42%" stop-color="#cdbb87"/>
+      <stop offset="52%" stop-color="#b9a978"/>
+      <stop offset="62%" stop-color="#cdbb87"/>
+      <stop offset="80%" stop-color="#a9d6ab"/>
+      <stop offset="100%" stop-color="#bfe3c9"/>
+    </linearGradient>
+    <filter id="terrainNoise" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.028" numOctaves="4" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"/>
+    </filter>
+    <filter id="textHalo" x="-40%" y="-40%" width="180%" height="180%">
+      <feMorphology operator="dilate" radius="2"/>
+      <feFlood flood-color="#eaf4f3"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+  svg.appendChild(defs);
+
+  // fondo con relieve esquemático (tono hipsométrico + textura de montaña)
+  const bgRect = document.createElementNS(svg.namespaceURI,'rect');
+  bgRect.setAttribute('x',0); bgRect.setAttribute('y',0);
+  bgRect.setAttribute('width',MAP_W); bgRect.setAttribute('height',MAP_H);
+  bgRect.setAttribute('fill','url(#hypsoGrad)');
+  svg.appendChild(bgRect);
+  const texRect = document.createElementNS(svg.namespaceURI,'rect');
+  texRect.setAttribute('x',0); texRect.setAttribute('y',0);
+  texRect.setAttribute('width',MAP_W); texRect.setAttribute('height',MAP_H);
+  texRect.setAttribute('filter','url(#terrainNoise)');
+  texRect.setAttribute('opacity','0.55');
+  texRect.setAttribute('style','mix-blend-mode:multiply');
+  svg.appendChild(texRect);
+  // franja de "costa" clara en los bordes norte/sur para separar tierra de mar
+  svg.appendChild(rectSVG(0,0,MAP_W,14,'#dff2ef',0.9));
+  svg.appendChild(rectSVG(0,MAP_H-14,MAP_W,14,'#dff2ef',0.9));
 
   // grid de referencia (lat/lon)
   const gridG = document.createElementNS(svg.namespaceURI,'g');
   for(let lat=8.0; lat<=9.5; lat+=0.5){
     const [x1,y1]=project(lat,LON_MIN), [x2,y2]=project(lat,LON_MAX);
-    gridG.appendChild(lineSVG(x1,y1,x2,y2,'#cfe1e0',0.6));
+    gridG.appendChild(lineSVG(x1,y1,x2,y2,'#ffffff',0.7,0.35));
   }
   for(let lon=-83; lon<=-80; lon+=0.5){
     const [x1,y1]=project(LAT_MIN,lon), [x2,y2]=project(LAT_MAX,lon);
-    gridG.appendChild(lineSVG(x1,y1,x2,y2,'#cfe1e0',0.6));
+    gridG.appendChild(lineSVG(x1,y1,x2,y2,'#ffffff',0.7,0.35));
   }
   svg.appendChild(gridG);
 
@@ -1179,7 +1220,10 @@ function renderMap(container, highlightCode){
   ];
   labels.forEach(l=>{
     const [x,y] = project(9.42, l.lon);
-    svg.appendChild(textSVG(x,y,l.txt,'#5a7a78',9.5,'middle'));
+    const t = textSVG(x,y,l.txt,'#3d5250',9.5,'middle');
+    t.setAttribute('filter','url(#textHalo)');
+    t.setAttribute('font-weight','600');
+    svg.appendChild(t);
   });
 
   const tooltip = document.getElementById('map-tooltip');
@@ -1191,8 +1235,10 @@ function renderMap(container, highlightCode){
     const isHi = highlightCode && st.code===highlightCode;
     const c = document.createElementNS(svg.namespaceURI,'circle');
     c.setAttribute('cx',x); c.setAttribute('cy',y);
-    c.setAttribute('r', isHi? 8 : 5);
+    c.setAttribute('r', isHi? 8 : 5.5);
     c.setAttribute('fill', colorForAvance(av.avgBD));
+    c.setAttribute('stroke','#ffffff');
+    c.setAttribute('stroke-width', isHi? 2.4 : 1.6);
     c.classList.add('station-dot');
     c.addEventListener('mousemove', (ev)=>{
       const rect = container.getBoundingClientRect();
@@ -1214,14 +1260,22 @@ function renderMap(container, highlightCode){
   });
 
   container.appendChild(svg);
-  const cap = el('div',{class:'map-caption'},['Mapa esquemático por coordenadas reales (lat/long) · color = % promedio cargado en base de datos · clic en un punto para ver el detalle']);
+  const cap = el('div',{class:'map-caption'},['Coordenadas reales de estaciones · relieve esquemático ilustrativo (no es cartografía oficial de elevación) · color = % promedio cargado en base de datos · clic en un punto para ver el detalle']);
   container.appendChild(cap);
 }
-function lineSVG(x1,y1,x2,y2,stroke,w){
+function lineSVG(x1,y1,x2,y2,stroke,w,opacity){
   const l = document.createElementNS('http://www.w3.org/2000/svg','line');
   l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
   l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',w);
+  if(opacity!=null) l.setAttribute('opacity',opacity);
   return l;
+}
+function rectSVG(x,y,w,h,fill,opacity){
+  const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);
+  r.setAttribute('fill',fill);
+  if(opacity!=null) r.setAttribute('opacity',opacity);
+  return r;
 }
 function textSVG(x,y,txt,fill,size,anchor){
   const t = document.createElementNS('http://www.w3.org/2000/svg','text');
